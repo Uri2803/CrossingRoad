@@ -92,24 +92,24 @@ const char bullet_model[100][100] = {
     {">=>"}};
 const picture bullet1(bullet_model, 1, 3);
 
-const char ghost2[100][100] =
+const char octo2[100][100] =
 {
     {"  ________ "},
     {" /        \\"},
     {" | __  __ |"},
-    {" |        |"},
-    {" |        |"},
-    {"/_/\\_/\\_/\\/"}};
-const picture ghost_2(ghost2, 6, 11);
-const char ghost1[100][100] =
+    {" \\        /"},
+    {" /        \\"},
+    {"/~/\\~/\\~/\\~\\"}};
+const picture octo_2(octo2, 6, 12);
+const char octo1[100][100] =
 {
     {"  ________ "},
     {" /        \\"},
     {" | ()  () |"},
-    {" |        |"},
-    {" |        |"},
-    {"/_/\\_/\\_/\\/"} };
-const picture ghost_1(ghost1, 6, 11);
+    {" \\        /"},
+    {" /        \\"},
+    {"/_/\\_/\\_/\\_\\"} };
+const picture octo_1(octo1, 6, 12);
 
 const char pum[100][100] =
 {
