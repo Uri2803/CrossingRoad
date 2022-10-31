@@ -20,6 +20,76 @@ public:
                 width = i.size();
     }
 };
+void color(int backgroundColor, int text_color)
+{
+    int wColor = backgroundColor * 16 + text_color; // 16*16 + 0
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), wColor);
+}
+void moveToXY(int x, int y)
+{
+    COORD cursor;
+    cursor.X = x;
+    cursor.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
+}
+void display_img(picture k, int x, int y, int backgroundColor, int TextColor)
+{
+    color(backgroundColor, TextColor);
+    for (int i = 0; i < k.height; i++)
+    {
+        moveToXY(x, y + i);
+        cout << k.image[i];
+    }
+}
+class Position // to be inherited by manything
+{
+public:
+    int x, y;
+    Position() {}
+    Position(int xPos, int yPos)
+    {
+        x = xPos;
+        y = yPos;
+    }
+};
+
+class Animation : public Position
+{
+    int track, cooldown, max_cooldown;
+    int backColor, textColor;
+
+public:
+    vector<picture> frames;
+    Animation() {}
+    Animation(vector<picture> list, int duration, Position posXY, int backgroundColor, int TextColor)
+    {
+        frames = list;
+        max_cooldown = duration;
+        cooldown = 0;
+        x = posXY.x;
+        y = posXY.y;
+        backColor = backgroundColor;
+        textColor = TextColor;
+        track = 0;
+    }
+    void play()
+    {
+        if (cooldown == 0)
+        {
+            cooldown = max_cooldown;
+            if (track < frames.size())
+            {
+                display_img(frames[track], x, y, backColor, textColor);
+                track++;
+                if (track == frames.size())
+                    track = 0;
+            }
+        }
+        else
+            cooldown--;
+    }
+    picture getCurFrame() { return frames[track]; }
+};
 // this is how we made model or initialized things
 // special type of animation
 const picture car1(vector<string>{
@@ -31,6 +101,8 @@ const picture car2(vector<string>{
     "   ____",
     "__/_|__\\----__",
     "|(x)-------(x)|"});
+
+const vector<picture> carAnim{car1, car2};
 
 const picture nguoi1(vector<string>{
     "(x) ",
@@ -58,6 +130,8 @@ const picture intro2(vector<string>{
     "|  \\______/  |",
     "\\____________/"});
 
+const vector<picture> introAnim{intro1, intro2};
+
 const picture carAttack2(vector<string>{
     "  ==={MG]___",
     " ____/__|__\\__",
@@ -81,6 +155,8 @@ const picture octo1(vector<string>{
     " /        \\",
     "/_/\\_/\\_/\\_\\"});
 
+const vector<picture> octoAnim{octo1, octo2};
+
 const picture pum1(vector<string>{
     "  ___________ || ___________ ",
     " /           \\||/           \\",
@@ -94,7 +170,7 @@ const picture pum1(vector<string>{
     " \\    \\_/  \\______/  \\_/    /",
     "   ------------------------"});
 
-const picture pum_2(vector<string>{
+const picture pum2(vector<string>{
     "  ___________ || ___________ ",
     " /           \\||/           \\",
     "/             \\/             \\",
@@ -106,4 +182,6 @@ const picture pum_2(vector<string>{
     "\\     -----------------      /",
     " \\      \\/        \\/        /",
     "   ------------------------"});
+
+const vector<picture> pumAnim{pum1, pum2};
 #endif
