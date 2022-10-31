@@ -1,32 +1,40 @@
 #include <iostream>
+#include <fstream>
 #include <conio.h>
 #include <Windows.h>
 #include <mmsystem.h>
 #include <thread>
 #include "Pictures.h"
+#include <string>
 #pragma comment(lib, "Winmm.lib")
 // compile by this code: g++ Menu.cpp -o Menu.exe -lWinmm
 using namespace std;
-void moveToXY(int x, int y)
+void clearArea(int height, int width, int x, int y)
 {
-    COORD cursor;
-    cursor.X = x;
-    cursor.Y = y;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
-}
-void color(int backgroundColor, int text_color)
-{
-    int wColor = backgroundColor * 16 + text_color; // 16*16 + 0
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), wColor);
-}
-void display_img(picture k, int x, int y)
-{
-    color(15, 4);
-    for (int i = 0; i < k.height; i++)
+    for (int i = 0; i < height; i++)
     {
         moveToXY(x, y + i);
-        cout << k.image[i];
+        for (int j = 0; j < width; j++)
+            cout << " ";
     }
+}
+void updatePos(picture image, int x, int y) // used for animation
+{
+    for (int i = 0; i < image.height; i++)
+    {
+        for (int j = 0; j < image.width; j++)
+        {
+            moveToXY(x + j, y + i);
+            cout << " ";
+        }
+    }
+}
+void drawBorderOrSomething(int x, int y)
+{
+    moveToXY(x - 5, y - 15);
+    cout << "WELCOME TO GROUP 4 GAME";
+    moveToXY(x - 5, y - 14);
+    cout << "CROSSING ROAD";
 }
 class Music
 {
@@ -45,12 +53,23 @@ public:
         play();
     }
 };
-class Menu
+class Menu : public Position
 {
-    int x, y;
     int counter, hoverColor, defaultColor, background_color;
     bool OnMusic;
     Music *MP3;
+
+    vector<Animation *> MenuFrames;
+
+    bool stillGet;
+    thread *mainMenu;
+    thread *playMenu;
+    thread *optionMenu;
+
+    thread *saveGames;       // a thread to display save files
+    vector<string> saveFile; // there would be a class of save things then we can load them all
+
+    string state;
 
 public:
     Menu(int PosX, int PosY, int hoverColor_, int TextColor, int backgroundColor_)
@@ -63,212 +82,283 @@ public:
         background_color = backgroundColor_;
         OnMusic = true;
         MP3 = new Music();
+        MP3->play();
+
+        stillGet = true;
+
+        mainMenu = new thread(&Menu::drawMenu, this);
+        state = "mainMenu";
+        readSaveFile();
+
+        MenuFrames.push_back(new Animation(carAnim, 200, Position(x, y - 6), background_color, 12));
+        MenuFrames.push_back(new Animation(octoAnim, 400, Position(x, y + 10), background_color, 12));
+        MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 12));
+    }
+    void getCounter(); // the main loop for input, no drawing or moving cursor here
+    void exitMenu()
+    {
+        stillGet = false;
+        mainMenu->join();
     }
     void drawMenu();
     void drawMenuPlay();
     void drawMenuOption();
+    void drawLoadMenu();
+    void readSaveFile();
+    void playAnim();
 };
+void Menu::playAnim()
+{
+    for (auto i : MenuFrames)
+    {
+        i->play();
+        // i->x++;
+        // updatePos(i->getCurFrame(), i->x - 1, i->y);
+        // if (i->x > y + 100)
+        //     i->x = 0;
+    }
+}
+void Menu::readSaveFile()
+{
+    fstream file("savegame.txt", ios::in);
+    string temp;
+    while (!file.eof())
+    {
+        getline(file, temp, '\n');
+        saveFile.push_back(temp);
+    }
+    file.close();
+}
+void Menu::getCounter()
+{
+    while (stillGet)
+    {
+        char key = getch();
+        if (state == "mainMenu")
+        {
+            if (key == 'w' && counter > 1)
+                counter--;
+            if (key == 's' && counter < 3)
+                counter++;
+
+            if (key == '\r')
+            {
+                if (counter == 1)
+                {
+                    state = "playMenu";
+                    mainMenu->join();                                 // shutdown mainMenu thread
+                    playMenu = new thread(&Menu::drawMenuPlay, this); // start the playMenu thread
+                }
+                if (counter == 2)
+                {
+                    counter = 1;
+                    state = "optionMenu";
+                    mainMenu->join();                                     // shutdown mainMenu thread
+                    optionMenu = new thread(&Menu::drawMenuOption, this); // start the optionMenu thread
+                }
+                if (counter == 3) // exit the game
+                {
+                    // exitMenu();
+                    state = "exit";
+                    mainMenu->join();        // shutdown mainMenu thread
+                    moveToXY(x + 12, y + 2); // non can break except for this
+                    break;
+                }
+            }
+        }
+        else if (state == "playMenu")
+        {
+            if (key == 'w' && counter > 1)
+                counter--;
+            if (key == 's' && counter < 3)
+                counter++;
+
+            if (key == '\r')
+            {
+                if (counter == 1)
+                {
+                    // shutdown menu thread start game thread
+                }
+                if (counter == 2)
+                {
+                    state = "loadGame";
+                    playMenu->join();
+                    saveGames = new thread(&Menu::drawLoadMenu, this);
+                }
+                if (counter == 3)
+                {
+                    state = "mainMenu"; // back to the main menu thread
+                    playMenu->join();
+                    mainMenu = new thread(&Menu::drawMenu, this);
+                }
+            }
+        }
+        else if (state == "optionMenu")
+        {
+            if (key == 'w' && counter > 1)
+                counter--;
+            if (key == 's' && counter < 2)
+                counter++;
+            if (key == '\r')
+            {
+                if (counter == 1)
+                {
+                    if (OnMusic)
+                    {
+                        MP3->close();
+                        OnMusic = false;
+                    }
+                    else
+                    {
+                        MP3->newPlay();
+                        OnMusic = true;
+                    }
+                }
+                else
+                {
+                    state = "mainMenu";
+                    optionMenu->join();
+                    mainMenu = new thread(&Menu::drawMenu, this);
+                }
+            }
+        }
+        else if (state == "loadGame")
+        {
+            if (key == 'w' && counter > 1)
+                counter--;
+            if (key == 's' && counter < saveFile.size() + 1)
+                counter++;
+            if (key == '\r')
+            {
+                if (counter == 1)
+                {
+                    state = "playMenu";
+                    counter = 2;
+                    saveGames->join();
+                    playMenu = new thread(&Menu::drawMenuPlay, this);
+                }
+                else
+                {
+                    // load data to the player and start the game thread
+                    // or u can make another Menu list like remove save files, edit save file name
+                }
+            }
+        }
+    }
+}
+void Menu::drawLoadMenu()
+{
+    while (state == "loadGame")
+    {
+        playAnim();
+        moveToXY(x, y);
+        if (counter == 1)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
+        cout << "<--Back to Menu-->";
+
+        for (int i = 0; i < saveFile.size(); i++)
+        {
+            moveToXY(x, y + i + 1);
+            if (counter == i + 2)
+                color(background_color, hoverColor);
+            else
+                color(background_color, defaultColor);
+            cout << i + 1 << "." << saveFile[i] << "         ";
+        }
+    }
+    clearArea(saveFile.size() + 2, 20, x, y);
+}
 void Menu::drawMenuOption()
 {
-    if (OnMusic)
-        MP3->play();
-    int set[] = {defaultColor, defaultColor};
-    char key;
-    while (true)
+    clearArea(1, 10, x, y + 2);
+    while (state == "optionMenu")
     {
-        if (counter == 1)
-            set[0] = hoverColor;
-        else
-            set[0] = defaultColor;
-
-        if (counter == 2)
-            set[1] = hoverColor;
-        else
-            set[1] = defaultColor;
-
+        playAnim();
         moveToXY(x, y);
-        color(background_color, set[0]);
+        if (counter == 1)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
         cout << "1.Music: ";
         if (OnMusic)
-            cout << " ON";
+            cout << " ON ";
         else
             cout << " OFF";
 
         moveToXY(x, y + 1);
-        color(background_color, set[1]);
+        if (counter == 2)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
         cout << "2.Back to Menu";
-
-        moveToXY(x, y + 2);
-        cout << "               ";
-
-        key = getch();
-        if (key == 'w' && counter > 1)
-            counter--;
-        if (key == 's' && counter < 2)
-            counter++;
-        if (key == '\r')
-        {
-            if (counter == 1)
-            {
-                moveToXY(x + 12, y);
-                if (OnMusic)
-                {
-                    MP3->close();
-                    OnMusic = false;
-                    cout << "               ";
-                }
-                else
-                {
-                    MP3->newPlay();
-                    OnMusic = true;
-                    moveToXY(x, y);
-                    cout << "               ";
-                }
-            }
-            if (counter == 2)
-                break;
-        }
     }
-    drawMenu();
 }
 void Menu::drawMenuPlay()
 {
-    if (OnMusic)
-        MP3->play();
-    int set[] = {defaultColor, defaultColor, defaultColor};
-    char key;
-    while (true)
+    clearArea(3, 20, x, y);
+    while (state == "playMenu")
     {
-        if (counter == 1)
-            set[0] = hoverColor;
-        else
-            set[0] = defaultColor;
-
-        if (counter == 2)
-            set[1] = hoverColor;
-        else
-            set[1] = defaultColor;
-
-        if (counter == 3)
-            set[2] = hoverColor;
-        else
-            set[2] = defaultColor;
-
+        playAnim();
         moveToXY(x, y);
-        color(background_color, set[0]);
+        if (counter == 1)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
         cout << "1.New Game ";
 
         moveToXY(x, y + 1);
-        color(background_color, set[1]);
+        if (counter == 2)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
         cout << "2.Load Game";
 
         moveToXY(x, y + 2);
-        color(background_color, set[2]);
+        if (counter == 3)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
         cout << "3.Back to Menu";
-
-        key = getch();
-        if (key == 'w' && counter > 1)
-            counter--;
-        if (key == 's' && counter < 3)
-            counter++;
-
-        if (key == '\r')
-        {
-            if (counter == 1)
-                moveToXY(x + 12, y);
-            if (counter == 2)
-                moveToXY(x + 12, y + 1);
-            if (counter == 3)
-            {
-                goto choice;
-            }
-            cout << " Event " << counter << " occur ";
-        }
-    }
-choice:
-    if (counter == 1)
-        cout << "PLAY GAME";
-    if (counter == 2)
-        cout << "LOAD GAME";
-    else
-    {
-        counter = 2;
-        drawMenu();
     }
 }
 
 void Menu::drawMenu()
 {
-    if (OnMusic)
-        MP3->play();
-    int set[] = {defaultColor, defaultColor, defaultColor};
-    char key;
-    while (true)
+    // display_img(octo1, x + 30, y - 10);
+    clearArea(3, 20, x, y);
+    while (state == "mainMenu")
     {
-        if (counter == 1)
-            set[0] = hoverColor;
-        else
-            set[0] = defaultColor;
+        playAnim();
+        moveToXY(x + 30, y);
+        color(background_color, 2);
+        cout << "WELCOME TO GROUP 4 GAME";
 
-        if (counter == 2)
-            set[1] = hoverColor;
-        else
-            set[1] = defaultColor;
-
-        if (counter == 3)
-            set[2] = hoverColor;
-        else
-            set[2] = defaultColor;
+        moveToXY(x + 30, y + 1);
+        color(background_color, 3);
+        cout << "   CROSSING ROAD";
 
         moveToXY(x, y);
-        color(background_color, set[0]);
-        cout << "1.Play Game       ";
+        if (counter == 1)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
+        cout << "1.Play Game";
 
         moveToXY(x, y + 1);
-        color(background_color, set[1]);
-        cout << "2.Option      ";
+        if (counter == 2)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
+        cout << "2.Option";
 
         moveToXY(x, y + 2);
-        color(background_color, set[2]);
-        cout << "3.Quit        ";
-
-        key = getch();
-        if (key == 'w' && counter > 1)
-            counter--;
-        if (key == 's' && counter < 3)
-            counter++;
-
-        if (key == '\r')
-        {
-            if (counter == 1)
-            {
-                drawMenuPlay();
-            }
-            if (counter == 2)
-            {
-                drawMenuOption();
-            }
-            if (counter == 3)
-            {
-                moveToXY(x + 12, y + 2);
-                break;
-            }
-        }
-    }
-choice:
-    if (counter == 1)
-        drawMenuPlay();
-    if (counter == 2)
-    {
-        moveToXY(x, y + 2);
-        cout << "           ";
-        drawMenuOption();
-    }
-    moveToXY(x / 2, y / 2);
-    if (OnMusic)
-    {
-        OnMusic = false;
-        MP3->close();
+        if (counter == 3)
+            color(background_color, hoverColor);
+        else
+            color(background_color, defaultColor);
+        cout << "3.Quit";
     }
 }
 
@@ -303,23 +393,9 @@ void SetFontAttribute() // used to design the font of the text
     wcscpy(letter.FaceName, L"Consolas"); // Choose your font
     SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &letter);
 }
-
-void playAnimation(int x, int y) // under development
-{
-    int index = 1;
-    while (true)
-    {
-        index = (index == 1) ? 2 : 1;
-        if (index == 1)
-            display_img(intro1, x, y);
-        else
-            display_img(intro2, x, y);
-        Sleep(100);
-    }
-}
 int main()
 {
-    int SCREEN_WIDTH = 110, SCREEN_HEIGHT = 60;
+    int SCREEN_WIDTH = 160, SCREEN_HEIGHT = 50;
     SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     SetConsoleTitle(TEXT("My Game Menu"));
     SetFontAttribute();
@@ -328,11 +404,5 @@ int main()
     system("color f0"); // remember to change this color too, its the whole background color
     noCursor();
 
-    // music.join();
-    GAME->drawMenu();
-    // thread UI(&Menu::drawMenu, *GAME); // require a pointer to member function, an object, parameters (maybe)
-    // thread anim(playAnimation, x + 30, y - 5);
-
-    // anim.join();
-    //  UI.join();
+    GAME->getCounter();
 }
