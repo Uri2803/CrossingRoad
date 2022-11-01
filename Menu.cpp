@@ -18,24 +18,6 @@ void clearArea(int height, int width, int x, int y)
             cout << " ";
     }
 }
-void updatePos(picture image, int x, int y) // used for animation
-{
-    for (int i = 0; i < image.height; i++)
-    {
-        for (int j = 0; j < image.width; j++)
-        {
-            moveToXY(x + j, y + i);
-            cout << " ";
-        }
-    }
-}
-void drawBorderOrSomething(int x, int y)
-{
-    moveToXY(x - 5, y - 15);
-    cout << "WELCOME TO GROUP 4 GAME";
-    moveToXY(x - 5, y - 14);
-    cout << "CROSSING ROAD";
-}
 class Music
 {
 public:
@@ -94,12 +76,12 @@ public:
         MenuFrames.push_back(new Animation(octoAnim, 400, Position(x, y + 10), background_color, 12));
         MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 12));
     }
-    void getCounter(); // the main loop for input, no drawing or moving cursor here
-    void exitMenu()
-    {
-        stillGet = false;
-        mainMenu->join();
-    }
+    void startMenu(); // the main loop for input, no drawing or moving cursor here
+    // void exitMenu()
+    // {
+    //     stillGet = false;
+    //     mainMenu->join();
+    // }
     void drawMenu();
     void drawMenuPlay();
     void drawMenuOption();
@@ -112,10 +94,6 @@ void Menu::playAnim()
     for (auto i : MenuFrames)
     {
         i->play();
-        // i->x++;
-        // updatePos(i->getCurFrame(), i->x - 1, i->y);
-        // if (i->x > y + 100)
-        //     i->x = 0;
     }
 }
 void Menu::readSaveFile()
@@ -129,7 +107,7 @@ void Menu::readSaveFile()
     }
     file.close();
 }
-void Menu::getCounter()
+void Menu::startMenu()
 {
     while (stillGet)
     {
@@ -243,6 +221,11 @@ void Menu::getCounter()
                     // or u can make another Menu list like remove save files, edit save file name
                 }
             }
+        }
+        else if (state == "playGame")
+        {
+            // start the new Game, thread, input new nameFile save for the game
+            // if (key == 'w') // get the input file here
         }
     }
 }
@@ -404,5 +387,5 @@ int main()
     system("color f0"); // remember to change this color too, its the whole background color
     noCursor();
 
-    GAME->getCounter();
+    GAME->startMenu();
 }
