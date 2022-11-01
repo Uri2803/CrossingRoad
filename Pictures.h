@@ -41,6 +41,17 @@ void display_img(picture k, int x, int y, int backgroundColor, int TextColor)
         cout << k.image[i];
     }
 }
+void updatePos(picture image, int x, int y)
+{
+    for (int i = 0; i < image.height; i++)
+    {
+        for (int j = 0; j < image.width; j++)
+        {
+            moveToXY(x + j, y + i);
+            cout << " ";
+        }
+    }
+}
 class Position // to be inherited by manything
 {
 public:
@@ -76,6 +87,10 @@ public:
     {
         if (cooldown == 0)
         {
+            x++;
+            updatePos(frames[track], x - 1, y);
+            if (x + frames[track].width > 120)
+                x = 0;
             cooldown = max_cooldown;
             if (track < frames.size())
             {
