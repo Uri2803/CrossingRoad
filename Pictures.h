@@ -199,4 +199,26 @@ const picture pum2(vector<string>{
     "   ------------------------"});
 
 const vector<picture> pumAnim{pum1, pum2};
+
+const picture m1(vector < string>{
+        " (X)  ",
+        " /|\\ ",
+        "/ | \\",
+        " / \\  ",
+        "/   \\ "
+});
+const picture m2(vector<string>{
+    " (X)  ",
+    " _|_/ ",
+    "/ |   ",
+    " / \\  ",
+    "/   \\  "
+});
+const picture m3(vector<string>{
+    "\\(X)/ ",
+    " \\|/   ",
+    "  | " ,
+    "\\/ \\" ,
+    "    \\  "
+});
 #endif
