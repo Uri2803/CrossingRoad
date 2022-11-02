@@ -221,4 +221,5 @@ const picture m3(vector<string>{
     "\\/ \\" ,
     "    \\  "
 });
+const vector<picture> man{ m1,m2,m3 };
 #endif
