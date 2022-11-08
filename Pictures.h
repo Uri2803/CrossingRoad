@@ -6,6 +6,7 @@
 using namespace std;
 // for game state
 enum GameState { mainMenu, playMenu, optionMenu, loadGame, playGame, pauseMenu, exitGame };
+enum MovingDir { left_, right_, up_, down_, idle_ };
 
 class picture
 {
@@ -71,12 +72,12 @@ class Animation : public Position
 {
     int track, cooldown, max_cooldown;
     int backColor, textColor;
-    string direction;
+    MovingDir direction;
 
 public:
     vector<picture> frames;
     Animation() {}
-    Animation(vector<picture> list, int duration, Position posXY, int backgroundColor, int TextColor, string dir = "left")
+    Animation(vector<picture> list, int duration, Position posXY, int backgroundColor, int TextColor, MovingDir dir = idle_)
     {
         frames = list;
         max_cooldown = duration;
@@ -92,28 +93,28 @@ public:
     {
         if (cooldown == 0)
         {
-            if (direction == "right")
+            if (direction == right_)
             {
                 x++;
                 updatePos(frames[track], x - 1, y);
                 if (x + frames[track].width > 120)
                     x = 0;
             }
-            if (direction == "left")
+            if (direction == left_)
             {
                 x--;
                 updatePos(frames[track], x + 1, y);
                 if (x < 0)
                     x = 120;
             }
-            if (direction == "up")
+            if (direction == up_)
             {
                 y--;
                 updatePos(frames[track], x, y + 1);
                 if (y < 0)
                     y = 20;
             }
-            if (direction == "down")
+            if (direction == down_)
             {
                 y++;
                 updatePos(frames[track], x, y - 1);
