@@ -274,13 +274,13 @@ void Menu::drawMenuCredit()
 
 		color(background_color, defaultColor);
 		moveToXY(x, y + 3);
-		cout << "Coder: Dinh Quang Phong";
+		cout << "21127668 - Dinh Quang Phong";
 		moveToXY(x, y + 4);
-		cout << "Designer: Hoang Le Cat Thanh";
+		cout << "21127730 - Hoang Le Cat Thanh";
 		moveToXY(x, y + 5);
-		cout << "Tester: Vo Cao Tri";
+		cout << "21127456 - Vo Cao Tri";
 		moveToXY(x, y + 6);
-		cout << "Leader: Huynh Minh Quang";
+		cout << "21127149 - Huynh Minh Quang";
 	}
 }
 void Menu::drawLoadMenu()
