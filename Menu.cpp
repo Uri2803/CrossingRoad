@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 #include <conio.h>
 #include <Windows.h>
@@ -6,6 +5,7 @@
 #include <thread>
 #include "Pictures.h"
 #include <string>
+#include <iostream>
 #pragma comment(lib, "Winmm.lib")
 // compile by this code: g++ Menu.cpp -o Menu.exe -lWinmm
 using namespace std;
@@ -39,43 +39,20 @@ class Menu : public Position
 {
     int counter, hoverColor, defaultColor, background_color;
     bool OnMusic;
-    Music *MP3;
+    Music* MP3;
 
-    vector<Animation *> MenuFrames;
+    vector<Animation*> MenuFrames;
 
     bool stillGet;
-    thread *mainMenu;
-    thread *playMenu;
-    thread *optionMenu;
+    thread* gameThread;
 
-    thread *saveGames;       // a thread to display save files
     vector<string> saveFile; // there would be a class of save things then we can load them all
-
-    string state;
+    GameState state;
 
 public:
-    Menu(int PosX, int PosY, int hoverColor_, int TextColor, int backgroundColor_)
-    {
-        x = PosX;
-        y = PosY;
-        counter = 2;
-        hoverColor = hoverColor_;
-        defaultColor = TextColor;
-        background_color = backgroundColor_;
-        OnMusic = true;
-        MP3 = new Music();
-        MP3->play();
-
-        stillGet = true;
-
-        mainMenu = new thread(&Menu::drawMenu, this);
-        state = "mainMenu";
-        readSaveFile();
-
-        MenuFrames.push_back(new Animation(carAnim, 200, Position(x, y - 6), background_color, 12));
-        MenuFrames.push_back(new Animation(octoAnim, 400, Position(x, y + 10), background_color, 12));
-        MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 12));
-    }
+    Menu() {}
+    ~Menu();          // we will write out new file save in the destructor to avoid user quit the game without saving process
+    Menu(int PosX, int PosY, int hoverColor_, int TextColor, int backgroundColor_);
     void startMenu(); // the main loop for input, no drawing or moving cursor here
     // void exitMenu()
     // {
@@ -88,7 +65,50 @@ public:
     void drawLoadMenu();
     void readSaveFile();
     void playAnim();
+    void drawIntroBlabla();
 };
+Menu::~Menu()
+{
+    fstream file("savegame.txt", ios::out);
+    for (auto i : saveFile)
+        file << i << endl;
+    file.close();
+}
+Menu::Menu(int PosX, int PosY, int hoverColor_, int TextColor, int backgroundColor_)
+{
+    x = PosX;
+    y = PosY;
+    counter = 2;
+    hoverColor = hoverColor_;
+    defaultColor = TextColor;
+    background_color = backgroundColor_;
+    OnMusic = true;
+    MP3 = new Music();
+    MP3->play();
+
+    stillGet = true;
+    gameThread = new thread(&Menu::drawMenu, this);
+    state = mainMenu;
+
+    readSaveFile();
+    srand(time(NULL));
+    MenuFrames.push_back(new Animation(man, 500, Position(x, y - 6), background_color, 12, "right"));
+    MenuFrames.push_back(new Animation(octoAnim, 500, Position(x, y + 10), background_color, 3, "left"));
+    MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 2, "idle"));
+    MenuFrames.push_back(new Animation(introAnim, 500, Position(x + 80, y - 5), background_color, 1, "down"));
+}
+void SetFontAttribute(int sizeX, int sizeY);
+void Menu::drawIntroBlabla()
+{
+    // SetFontAttribute(0, 16);
+    moveToXY(x + 30, y);
+    color(background_color, 2);
+    cout << "WELCOME TO GROUP 4 GAME";
+
+    moveToXY(x + 30, y + 1);
+    color(background_color, 3);
+    cout << "   CROSSING ROAD";
+}
 void Menu::playAnim()
 {
     for (auto i : MenuFrames)
@@ -103,7 +123,8 @@ void Menu::readSaveFile()
     while (!file.eof())
     {
         getline(file, temp, '\n');
-        saveFile.push_back(temp);
+        if (temp != "")
+            saveFile.push_back(temp);
     }
     file.close();
 }
@@ -112,7 +133,11 @@ void Menu::startMenu()
     while (stillGet)
     {
         char key = getch();
-        if (state == "mainMenu")
+        /*if (key == 'u')
+            SetFontAttribute(0, 24);
+        else
+            SetFontAttribute(0, 18);*/
+        if (state == mainMenu)
         {
             if (key == 'w' && counter > 1)
                 counter--;
@@ -123,28 +148,27 @@ void Menu::startMenu()
             {
                 if (counter == 1)
                 {
-                    state = "playMenu";
-                    mainMenu->join();                                 // shutdown mainMenu thread
-                    playMenu = new thread(&Menu::drawMenuPlay, this); // start the playMenu thread
+                    state = playMenu;
+                    gameThread->join();                                 // shutdown mainMenu thread
+                    gameThread = new thread(&Menu::drawMenuPlay, this); // start the playMenu thread
                 }
                 if (counter == 2)
                 {
                     counter = 1;
-                    state = "optionMenu";
-                    mainMenu->join();                                     // shutdown mainMenu thread
-                    optionMenu = new thread(&Menu::drawMenuOption, this); // start the optionMenu thread
+                    state = optionMenu;
+                    gameThread->join();                                   // shutdown mainMenu thread
+                    gameThread = new thread(&Menu::drawMenuOption, this); // start the optionMenu thread
                 }
                 if (counter == 3) // exit the game
                 {
-                    // exitMenu();
-                    state = "exit";
-                    mainMenu->join();        // shutdown mainMenu thread
+                    state = exitGame;
+                    gameThread->join();      // shutdown mainMenu thread
                     moveToXY(x + 12, y + 2); // non can break except for this
                     break;
                 }
             }
         }
-        else if (state == "playMenu")
+        else if (state == playMenu)
         {
             if (key == 'w' && counter > 1)
                 counter--;
@@ -159,19 +183,19 @@ void Menu::startMenu()
                 }
                 if (counter == 2)
                 {
-                    state = "loadGame";
-                    playMenu->join();
-                    saveGames = new thread(&Menu::drawLoadMenu, this);
+                    state = loadGame;
+                    gameThread->join();
+                    gameThread = new thread(&Menu::drawLoadMenu, this);
                 }
                 if (counter == 3)
                 {
-                    state = "mainMenu"; // back to the main menu thread
-                    playMenu->join();
-                    mainMenu = new thread(&Menu::drawMenu, this);
+                    state = mainMenu; // back to the main menu thread
+                    gameThread->join();
+                    gameThread = new thread(&Menu::drawMenu, this);
                 }
             }
         }
-        else if (state == "optionMenu")
+        else if (state == optionMenu)
         {
             if (key == 'w' && counter > 1)
                 counter--;
@@ -194,13 +218,13 @@ void Menu::startMenu()
                 }
                 else
                 {
-                    state = "mainMenu";
-                    optionMenu->join();
-                    mainMenu = new thread(&Menu::drawMenu, this);
+                    state = mainMenu;
+                    gameThread->join();
+                    gameThread = new thread(&Menu::drawMenu, this);
                 }
             }
         }
-        else if (state == "loadGame")
+        else if (state == loadGame)
         {
             if (key == 'w' && counter > 1)
                 counter--;
@@ -210,10 +234,10 @@ void Menu::startMenu()
             {
                 if (counter == 1)
                 {
-                    state = "playMenu";
+                    state = playMenu;
                     counter = 2;
-                    saveGames->join();
-                    playMenu = new thread(&Menu::drawMenuPlay, this);
+                    gameThread->join();
+                    gameThread = new thread(&Menu::drawMenuPlay, this);
                 }
                 else
                 {
@@ -222,7 +246,7 @@ void Menu::startMenu()
                 }
             }
         }
-        else if (state == "playGame")
+        else if (state == playGame)
         {
             // start the new Game, thread, input new nameFile save for the game
             // if (key == 'w') // get the input file here
@@ -231,9 +255,10 @@ void Menu::startMenu()
 }
 void Menu::drawLoadMenu()
 {
-    while (state == "loadGame")
+    while (state == loadGame)
     {
-        playAnim();
+        drawIntroBlabla();
+
         moveToXY(x, y);
         if (counter == 1)
             color(background_color, hoverColor);
@@ -256,9 +281,11 @@ void Menu::drawLoadMenu()
 void Menu::drawMenuOption()
 {
     clearArea(1, 10, x, y + 2);
-    while (state == "optionMenu")
+    while (state == optionMenu)
     {
         playAnim();
+        drawIntroBlabla();
+
         moveToXY(x, y);
         if (counter == 1)
             color(background_color, hoverColor);
@@ -281,9 +308,11 @@ void Menu::drawMenuOption()
 void Menu::drawMenuPlay()
 {
     clearArea(3, 20, x, y);
-    while (state == "playMenu")
+    while (state == playMenu)
     {
         playAnim();
+        drawIntroBlabla();
+
         moveToXY(x, y);
         if (counter == 1)
             color(background_color, hoverColor);
@@ -309,18 +338,11 @@ void Menu::drawMenuPlay()
 
 void Menu::drawMenu()
 {
-    // display_img(octo1, x + 30, y - 10);
     clearArea(3, 20, x, y);
-    while (state == "mainMenu")
+    while (state == mainMenu)
     {
         playAnim();
-        moveToXY(x + 30, y);
-        color(background_color, 2);
-        cout << "WELCOME TO GROUP 4 GAME";
-
-        moveToXY(x + 30, y + 1);
-        color(background_color, 3);
-        cout << "   CROSSING ROAD";
+        drawIntroBlabla();
 
         moveToXY(x, y);
         if (counter == 1)
@@ -355,6 +377,8 @@ void SetWindowSize(int height, int width)
     WindowSize.Bottom = height;
 
     SetConsoleWindowInfo(hStdout, 1, &WindowSize);
+	ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
+    // SetWindowPos(GetConsoleWindow(), 0, 0, 0, width * 100, height * 16, SWP_SHOWWINDOW | SWP_NOMOVE);
 }
 void noCursor()
 {
@@ -364,13 +388,13 @@ void noCursor()
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Info);
 }
 
-void SetFontAttribute() // used to design the font of the text
+void SetFontAttribute(int sizeX, int sizeY) // used to design the font of the text
 {
     CONSOLE_FONT_INFOEX letter;
     letter.cbSize = sizeof(letter);
     letter.nFont = 0;
-    letter.dwFontSize.X = 0;  // Width of each character in the font
-    letter.dwFontSize.Y = 24; // Height
+    letter.dwFontSize.X = sizeX;  // Width of each character in the font
+    letter.dwFontSize.Y = sizeY; // Height
     letter.FontFamily = FF_DONTCARE;
     letter.FontWeight = FW_NORMAL;
     wcscpy(letter.FaceName, L"Consolas"); // Choose your font
@@ -380,12 +404,11 @@ int main()
 {
     int SCREEN_WIDTH = 160, SCREEN_HEIGHT = 50;
     SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    SetConsoleTitle(TEXT("My Game Menu"));
-    SetFontAttribute();
+    SetConsoleTitle(TEXT("My Weird Game"));
+	SetFontAttribute(0, 24);
     int x = 30, y = 10;
-    Menu *GAME = new Menu(x, y, 0, 8, 15);
     system("color f0"); // remember to change this color too, its the whole background color
     noCursor();
-
-    GAME->startMenu();
+    Menu GAME = Menu(30, 10, 0, 8, 15);
+    GAME.startMenu();
 }
