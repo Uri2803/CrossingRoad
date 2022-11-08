@@ -92,10 +92,10 @@ Menu::Menu(int PosX, int PosY, int hoverColor_, int TextColor, int backgroundCol
 
     readSaveFile();
     srand(time(NULL));
-    MenuFrames.push_back(new Animation(man, 500, Position(x, y - 6), background_color, 12, "right"));
-    MenuFrames.push_back(new Animation(octoAnim, 500, Position(x, y + 10), background_color, 3, "left"));
-    MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 2, "idle"));
-    MenuFrames.push_back(new Animation(introAnim, 500, Position(x + 80, y - 5), background_color, 1, "down"));
+    MenuFrames.push_back(new Animation(man, 500, Position(x, y), background_color, 12, "right"));
+    MenuFrames.push_back(new Animation(carAnim, 100, Position(x, y + 6), background_color, 3, "right"));
+    // MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 2, "idle"));
+    // MenuFrames.push_back(new Animation(introAnim, 500, Position(x + 50, y - 5), background_color, 1, "down"));
 }
 void SetFontAttribute(int sizeX, int sizeY);
 void Menu::drawIntroBlabla()
@@ -377,7 +377,7 @@ void SetWindowSize(int height, int width)
     WindowSize.Bottom = height;
 
     SetConsoleWindowInfo(hStdout, 1, &WindowSize);
-	ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
+    ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
     // SetWindowPos(GetConsoleWindow(), 0, 0, 0, width * 100, height * 16, SWP_SHOWWINDOW | SWP_NOMOVE);
 }
 void noCursor()
@@ -402,13 +402,13 @@ void SetFontAttribute(int sizeX, int sizeY) // used to design the font of the te
 }
 int main()
 {
-    int SCREEN_WIDTH = 160, SCREEN_HEIGHT = 50;
+    int SCREEN_WIDTH = 50, SCREEN_HEIGHT = 20;
     SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    SetConsoleTitle(TEXT("My Weird Game"));
-	SetFontAttribute(0, 24);
+    SetConsoleTitle(TEXT("Crossing Road"));
+    SetFontAttribute(0, 24);
     int x = 30, y = 10;
     system("color f0"); // remember to change this color too, its the whole background color
     noCursor();
-    Menu GAME = Menu(30, 10, 0, 8, 15);
+    Menu GAME = Menu(10, 0, 0, 8, 15);
     GAME.startMenu();
 }
