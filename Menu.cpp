@@ -96,8 +96,8 @@ Menu::Menu(int PosX, int PosY, int hoverColor_, int TextColor, int backgroundCol
 
 	readSaveFile();
 	srand(time(NULL));
-	MenuFrames.push_back(new Animation(man, 400, Position(x, y + 14), background_color, 4, right_));
-	MenuFrames.push_back(new Animation(carAnim, 100, Position(x, y + 10), background_color, 1, right_));
+	MenuFrames.push_back(new Animation(man, 1000, Position(x, y + 14), background_color, 4, right_));
+	MenuFrames.push_back(new Animation(carAnim, 300, Position(x, y + 10), background_color, 1, right_));
 	/*MenuFrames.push_back(new Animation(octoAnim, 500, Position(x, y + 10), background_color, 3, left_));
 	MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 2, idle_));
 	MenuFrames.push_back(new Animation(introAnim, 500, Position(x + 80, y - 5), background_color, 1, down_));*/
@@ -285,7 +285,7 @@ void Menu::drawMenuCredit()
 }
 void Menu::drawLoadMenu()
 {
-	display_img(title, x - 20, y - 9, background_color, 12);
+	display_img(title, x - 21, y - 9, background_color, 12);
 	color(background_color, defaultColor);
 	for (int i = 0; i < saveFile.size() + 1; i++)
 	{
