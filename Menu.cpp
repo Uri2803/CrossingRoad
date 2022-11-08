@@ -65,7 +65,7 @@ public:
     void drawLoadMenu();
     void readSaveFile();
     void playAnim();
-    void drawIntroBlabla();
+    void drawMenuBorder();
 };
 Menu::~Menu()
 {
@@ -92,23 +92,16 @@ Menu::Menu(int PosX, int PosY, int hoverColor_, int TextColor, int backgroundCol
 
     readSaveFile();
     srand(time(NULL));
-    MenuFrames.push_back(new Animation(man, 500, Position(x, y + 7), background_color, 12, up_));
-    MenuFrames.push_back(new Animation(carAnim, 100, Position(x, y + 6), background_color, 1, right_));
+    MenuFrames.push_back(new Animation(man, 400, Position(x, y + 14), background_color, 4, right_));
+    MenuFrames.push_back(new Animation(carAnim, 100, Position(x, y + 10), background_color, 1, right_));
     /*MenuFrames.push_back(new Animation(octoAnim, 500, Position(x, y + 10), background_color, 3, "left"));
     MenuFrames.push_back(new Animation(pumAnim, 700, Position(x + 30, y + 5), background_color, 2, "idle"));
     MenuFrames.push_back(new Animation(introAnim, 500, Position(x + 80, y - 5), background_color, 1, "down"));*/
 }
 void SetFontAttribute(int sizeX, int sizeY);
-void Menu::drawIntroBlabla()
+void Menu::drawMenuBorder()
 {
-    // SetFontAttribute(0, 16);
-    moveToXY(x + 30, y);
-    color(background_color, 2);
-    cout << "WELCOME TO GROUP 4 GAME";
-
-    moveToXY(x + 30, y + 1);
-    color(background_color, 3);
-    cout << "   CROSSING ROAD";
+    
 }
 void Menu::playAnim()
 {
@@ -254,8 +247,14 @@ void Menu::drawLoadMenu()
 {
     while (state == loadGame)
     {
-        drawIntroBlabla();
-
+        display_img(title, x - 20, y - 9, background_color, 12);
+        moveToXY(x - 1, y - 1);
+        cout << "_____________________________________________________________";
+        for (int i = 0; i < 5; i++)
+        {
+            moveToXY(x - 2, y + i);
+            cout << "|";
+        }
         moveToXY(x, y);
         if (counter == 1)
             color(background_color, hoverColor);
@@ -267,10 +266,15 @@ void Menu::drawLoadMenu()
         {
             moveToXY(x, y + i + 1);
             if (counter == i + 2)
+            {
                 color(background_color, hoverColor);
+                cout << "--->" << saveFile[i] << "         ";
+            }
             else
+            {
                 color(background_color, defaultColor);
-            cout << i + 1 << "." << saveFile[i] << "         ";
+                cout << "    " << saveFile[i] << "         ";
+            }
         }
     }
     clearArea(saveFile.size() + 2, 20, x, y);
@@ -281,7 +285,14 @@ void Menu::drawMenuOption()
     while (state == optionMenu)
     {
         playAnim();
-        drawIntroBlabla();
+        display_img(title, x - 20, y - 9, background_color, 12);
+        moveToXY(x - 1, y - 1);
+        cout << "_____________________________________________________________";
+        for (int i = 0; i < 5; i++)
+        {
+            moveToXY(x - 2, y + i);
+            cout << "|";
+        }
 
         moveToXY(x, y);
         if (counter == 1)
@@ -308,7 +319,14 @@ void Menu::drawMenuPlay()
     while (state == playMenu)
     {
         playAnim();
-        drawIntroBlabla();
+        display_img(title, x - 20, y - 9, background_color, 12);
+        moveToXY(x - 1, y - 1);
+        cout << "_____________________________________________________________";
+        for (int i = 0; i < 5; i++)
+        {
+            moveToXY(x - 2, y + i);
+            cout << "|";
+        }
 
         moveToXY(x, y);
         if (counter == 1)
@@ -339,23 +357,33 @@ void Menu::drawMenu()
     while (state == mainMenu)
     {
         playAnim();
-        drawIntroBlabla();
+        display_img(title, x - 20, y - 9, background_color, 12);
 
-        moveToXY(x, y);
+        color(background_color, defaultColor);
+        moveToXY(x - 1, y - 1);
+        cout << "----------";
+        moveToXY(x - 1, y);
+        cout << "|";
+        moveToXY(x - 1, y + 1);
+        cout << "|";
+        moveToXY(x - 1, y + 2);
+
         if (counter == 1)
             color(background_color, hoverColor);
         else
             color(background_color, defaultColor);
-        cout << "1.Play Game";
+        
+        moveToXY(x, y);
+        cout << "Play Game";
 
-        moveToXY(x, y + 1);
+        moveToXY(x, y + 2);
         if (counter == 2)
             color(background_color, hoverColor);
         else
             color(background_color, defaultColor);
         cout << "2.Option";
 
-        moveToXY(x, y + 2);
+        moveToXY(x, y + 3);
         if (counter == 3)
             color(background_color, hoverColor);
         else
@@ -374,7 +402,7 @@ void SetWindowSize(int height, int width)
     WindowSize.Bottom = height;
 
     SetConsoleWindowInfo(hStdout, 1, &WindowSize);
-	ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
+    ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
     // SetWindowPos(GetConsoleWindow(), 0, 0, 0, width * 100, height * 16, SWP_SHOWWINDOW | SWP_NOMOVE);
 }
 void noCursor()
@@ -399,13 +427,13 @@ void SetFontAttribute(int sizeX, int sizeY) // used to design the font of the te
 }
 int main()
 {
-    int SCREEN_WIDTH = 50, SCREEN_HEIGHT = 30;
+    int SCREEN_WIDTH = 160, SCREEN_HEIGHT = 50;
     SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     SetConsoleTitle(TEXT("My Weird Game"));
-	SetFontAttribute(0, 24);
+    SetFontAttribute(0, 24);
     int x = 30, y = 10;
     system("color f0"); // remember to change this color too, its the whole background color
     noCursor();
-    Menu GAME = Menu(30, 10, 0, 8, 15);
+    Menu GAME = Menu(50, 10, 0, 8, 15);
     GAME.startMenu();
 }
