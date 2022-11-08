@@ -4,6 +4,9 @@
 #include <iostream>
 #include <vector>
 using namespace std;
+// for game state
+enum GameState { mainMenu, playMenu, optionMenu, loadGame, playGame, pauseMenu, exitGame };
+
 class picture
 {
 public:
@@ -68,11 +71,12 @@ class Animation : public Position
 {
     int track, cooldown, max_cooldown;
     int backColor, textColor;
+    string direction;
 
 public:
     vector<picture> frames;
     Animation() {}
-    Animation(vector<picture> list, int duration, Position posXY, int backgroundColor, int TextColor)
+    Animation(vector<picture> list, int duration, Position posXY, int backgroundColor, int TextColor, string dir = "left")
     {
         frames = list;
         max_cooldown = duration;
@@ -82,15 +86,40 @@ public:
         backColor = backgroundColor;
         textColor = TextColor;
         track = 0;
+        direction = dir;
     }
     void play()
     {
         if (cooldown == 0)
         {
-            x++;
-            updatePos(frames[track], x - 1, y);
-            if (x + frames[track].width > 120)
-                x = 0;
+            if (direction == "right")
+            {
+                x++;
+                updatePos(frames[track], x - 1, y);
+                if (x + frames[track].width > 120)
+                    x = 0;
+            }
+            if (direction == "left")
+            {
+                x--;
+                updatePos(frames[track], x + 1, y);
+                if (x < 0)
+                    x = 120;
+            }
+            if (direction == "up")
+            {
+                y--;
+                updatePos(frames[track], x, y + 1);
+                if (y < 0)
+                    y = 20;
+            }
+            if (direction == "down")
+            {
+                y++;
+                updatePos(frames[track], x, y - 1);
+                if (y + getCurFrame().width > 40)
+                    y = 0;
+            }
             cooldown = max_cooldown;
             if (track < frames.size())
             {
@@ -117,7 +146,7 @@ const picture car2(vector<string>{
     "__/_|__\\----__",
     "|(x)-------(x)|"});
 
-const vector<picture> carAnim{car1, car2};
+const vector<picture> carAnim{ car1, car2 };
 
 const picture nguoi1(vector<string>{
     "(x) ",
@@ -134,7 +163,7 @@ const picture intro1(vector<string>{
     "/  \\______/  \\",
     "| (.)     (.)|",
     "|  ________  |",
-    "|             |",
+    "|            |",
     "\\____________/"});
 
 const picture intro2(vector<string>{
@@ -142,10 +171,10 @@ const picture intro2(vector<string>{
     "/  \\______/  \\",
     "| (.)     (.)|",
     "|  ________  |",
-    "|  \\______/  |",
+    "|    \\__/    |",
     "\\____________/"});
 
-const vector<picture> introAnim{intro1, intro2};
+const vector<picture> introAnim{ intro1, intro2 };
 
 const picture carAttack2(vector<string>{
     "  ==={MG]___",
@@ -170,7 +199,7 @@ const picture octo1(vector<string>{
     " /        \\",
     "/_/\\_/\\_/\\_\\"});
 
-const vector<picture> octoAnim{octo1, octo2};
+const vector<picture> octoAnim{ octo1, octo2 };
 
 const picture pum1(vector<string>{
     "  ___________ || ___________ ",
@@ -198,28 +227,28 @@ const picture pum2(vector<string>{
     " \\      \\/        \\/        /",
     "   ------------------------"});
 
-const vector<picture> pumAnim{pum1, pum2};
+const vector<picture> pumAnim{ pum1, pum2 };
 
 const picture m1(vector < string>{
-        " (X)  ",
-        " /|\\ ",
-        "/ | \\",
-        " / \\  ",
-        "/   \\ "
+    " (X)  ",
+    " /|\\ ",
+    "/ | \\",
+    " / \\  ",
+    "/   \\ "
 });
 const picture m2(vector<string>{
     " (X)  ",
-    " _|_/ ",
-    "/ |   ",
-    " / \\  ",
-    "/   \\  "
+    " /|\\ ",
+    " \\| \\  ",
+    "  |\\  ",
+    " /  |  "
 });
 const picture m3(vector<string>{
-    "\\(X)/ ",
-    " \\|/   ",
-    "  | " ,
-    "\\/ \\" ,
-    "    \\  "
+    "  (X) ",
+    "  /|\\   ",
+    " / |/",
+    "  / \\",
+    " |   \\ "
 });
 const vector<picture> man{ m1,m2,m3 };
 #endif
