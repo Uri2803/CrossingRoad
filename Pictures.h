@@ -6,7 +6,7 @@
 #include <vector>
 using namespace std;
 // for game state
-enum GameState { mainMenu, playMenu, optionMenu, loadGame, playGame, pauseMenu, aboutMenu, exitGame };
+enum GameState { mainMenu, playMenu, optionMenu, loadGame, playGame, pauseMenu, credits, exitGame };
 enum MovingDir { left_, right_, up_, down_, idle_ };
 
 class picture
