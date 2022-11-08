@@ -161,21 +161,52 @@ const picture m1(vector < string>{
         " / \\  ",
         "/   \\ "
 });
+const picture m1(vector<string>{
+    " o ",
+        "/|\\",
+        "/ \\"
+});
 const picture m2(vector<string>{
-    " (X)  ",
-        " /|\\ ",
-        " \\| \\  ",
-        "  |\\  ",
-        " /  |  "
+    "\\ o /",
+        "  |  ",
+        " / \\ "
 });
 const picture m3(vector<string>{
-    "  (X) ",
-        "  /|\\   ",
-        " / |/",
-        "  / \\",
-        " |   \\ "
+    "_ o ",
+        " /\\",
+        "| \\"
 });
-const vector<picture> man{ m1,m2,m3 };
+const picture m4(vector<string>{
+    "",
+        " ___\\o",
+        "/)  | "
+});
+const picture m5(vector<string>{
+    "__|  ",
+        "  \\o ",
+        "  ( \\"
+});
+const picture m6(vector<string>{
+    "\\ /",
+        " | ",
+        "/o\\"
+});
+const picture m7(vector<string>{
+    "   |__",
+        " o/   ",
+        "/ )   "
+});
+const picture m8(vector<string>{
+    "",
+        "o/__ ",
+        "|  (\\"
+});
+const picture m9(vector<string>{
+    "o _",
+        "/\\ ",
+        "/ |"
+});
+const vector<picture> man{ m1,m2,m3,m4,m5,m6,m7,m8,m9,m2,m1 };
 
 const picture title(vector<string>{
     " _____                   _                                    _ ",
