@@ -154,13 +154,6 @@ const picture pum2(vector<string>{
 
 const vector<picture> pumAnim{ pum1, pum2 };
 
-const picture m1(vector < string>{
-    " (X)  ",
-        " /|\\ ",
-        "/ | \\",
-        " / \\  ",
-        "/   \\ "
-});
 const picture m1(vector<string>{
     " o ",
         "/|\\",
