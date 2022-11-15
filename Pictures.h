@@ -36,7 +36,7 @@ const picture car2(vector<wstring>{
     L"   ____",
     L"__/_|__\\----__",
     L"|(x)-------(x)|"});
-const vector<picture>car{car1,car2};
+const vector<picture>carAnim{car1,car2};
 
 const picture ship1(vector<wstring>{
     L"     //     ______[_]======   ______",
@@ -81,7 +81,7 @@ const picture octo1(vector<wstring>{
     L" \\        /",
     L" /        \\",
     L"/_/\\_/\\_/\\_\\"});
-const vector<picture> octo{octo1, octo2};
+const vector<picture> octoAnim{octo1, octo2};
 
 const picture pum1(vector<wstring>{
     L"  ___________ || ___________ ",
@@ -108,7 +108,7 @@ const picture pum_2(vector<wstring>{
     L"\\     -----------------      /",
     L" \\      \\/        \\/        /",
         L"   ------------------------"});
-const vector<picture>pum{pum1, pum_2};
+const vector<picture>pumAnim{pum1, pum_2};
 
 const picture dog1(vector<wstring>{
     L"      __",
@@ -122,7 +122,7 @@ const picture dog2(vector<wstring>{
     L"/¸    /`",
     L"\\\\'--//"
 });
-const vector<picture> dog{dog1, dog2};
+const vector<picture> dogAnim{dog1, dog2};
 
 const picture m1(vector<wstring>{
     L" o ",
@@ -169,7 +169,7 @@ const picture m9(vector<wstring>{
         L"/\\ ",
         L"/ |"
 });
-const vector<picture>{m1, m2, m3, m4, m5, m6, m7, m8, m9, m2, m1};
+const vector<picture>manAnim{m1, m2, m3, m4, m5, m6, m7, m8, m9, m2, m1};
 
 const picture title(vector<wstring>{
     L" _____                   _                                    _ ",
