@@ -21,9 +21,9 @@ public:
             return frames[track - 1];
     }
 };
-const Animation carAnimator(carAnim, 100, COLOUR::BG_WHITE | FG_DARK_MAGENTA);
-const Animation manAnimator(manAnim, 300, COLOUR::BG_WHITE | FG_DARK_GREY);
-const Animation octoAnimator(octoAnim, 300, COLOUR::BG_WHITE | FG_CYAN);
-const Animation pumAnimator(pumAnim, 300, COLOUR::BG_WHITE | FG_DARK_RED);
-const Animation introAnimator(introAnim, 300, COLOUR::BG_WHITE | FG_DARK_YELLOW);
+const Animation carAnimator(carAnim, 100, COLOUR::FG_DARK_MAGENTA);
+const Animation manAnimator(manAnim, 300, COLOUR::FG_DARK_GREY);
+const Animation octoAnimator(octoAnim, 300, COLOUR::FG_CYAN);
+const Animation pumAnimator(pumAnim, 300, COLOUR::FG_DARK_RED);
+const Animation introAnimator(introAnim, 300, COLOUR::FG_DARK_BLUE);
 #endif // !_ANIMATION_
