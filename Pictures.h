@@ -74,23 +74,58 @@ public:
 // this is how we made model or initialized things
 // special type of animation
 const picture car1(vector<wstring>{
-    L"    _____",
-    L" __╱_|___╲____",
-    L"╰(+)───────(+)╯"});
+        L"    _____",
+        L" __╱_|___╲____",
+        L"╰(+)───────(+)╯"});
 
 const picture car2(vector<wstring>{
-    L"    _____",
-    L" __╱_|___╲____",
-    L"╰(x)───────(x)╯"});
-
+        L"    _____",
+        L" __╱_|___╲____",
+        L"╰(x)───────(x)╯"});
 const vector<picture> carAnim{ car1, car2 };
 
-const picture ship1(vector<wstring>{
-    L"     //     ______[_]======   ______",
-    L"____[T]____|__|     |________/     /",
-    L"\\_________________________________/ "});
+const picture car3(vector<wstring>{
+        L"      _____",
+        L" ____/___|_╲__",
+        L"╰(x)───────(x)╯"
+});
+const picture car4(vector<wstring>{
+        L"      _____",
+        L" ____/___|_╲__",
+        L"╰(+)───────(+)╯"
+});
+const vector<picture> carAnim1{ car3, car4 };
+
+const picture truck1(vector<wstring>{
+        L"  ___┑",
+        L" ╱/_||________",
+        L"‖ᴐ___╠─────────┡",
+        L"┖(x)───────(x)┚"
+});
+const picture truck2(vector<wstring>{
+        L"  ___┑",
+        L" ╱/_||________,",
+        L"‖ᴐ___╠─────────┡",
+        L"┖(+)───────(+)┚"
+});
+const vector<picture> truckAnimLeft{ truck1, truck2 };
+
+const picture truck3(vector<wstring>{
+        L"         ┍___",
+        L",________||_╲╲",
+        L"┦─────────╢__с║",
+        L"┖(x)───────(x)┚"
+});
+const picture truck4(vector<wstring>{
+        L"         ┍___",
+        L" ________||_╲╲",
+        L"┦─────────╢__с║",
+        L"┖(+)───────(+)┚"
+});
+const vector<picture> truckAnimRight{ truck3, truck4 };
 
 const picture intro1(vector<wstring>{
+    L"T là người chơi",
     L" __        __",
     L"/  \\______/  \\",
     L"| (.)     (.)|",
@@ -99,6 +134,7 @@ const picture intro1(vector<wstring>{
     L"\\____________/"});
 
 const picture intro2(vector<wstring>{
+    L"T là người chơi",
     L" __        __",
     L"/  \\______/  \\",
     L"| (.)     (.)|",
@@ -165,62 +201,136 @@ const picture dog1(vector<wstring>{
     L"      __",
     L" (___()ˊˋ",
     L"/¸    /`",
-    L"//'-- \\\\"
+    L"//'-- ╲╲"
 });
 const picture dog2(vector<wstring>{
     L"      __",
     L" (___()ˊˋ",
     L"/¸    /`",
-    L"\\\\'--//"
+    L"╲╲'--//"
 });
 const vector<picture> dogAnim{ dog1, dog2 };
 
+const picture deer1(vector<wstring>{
+        L"    (__)",
+        L" Ϛ__/''•",
+        L" /___ |",
+        L"╱╱   ╲╲"
+});
+const picture deer2(vector<wstring>{
+        L"    (__)",
+        L" Ϛ__/''•",
+        L" /___ |",
+        L" ╲╲ ╱╱"
+});
+const vector<picture> deerAnim_right{ deer1, deer2 };
+
+const picture deer3(vector<wstring>{
+        L"(__)",
+        L"•''╲__ɂ",
+        L" | ___ ╲",
+        L" //    ╲╲"
+});
+const picture deer4(vector<wstring>{
+        L"(__)",
+        L"•''╲__ɂ",
+        L" | ___ ╲",
+        L"  ╲╲  //"
+});
+const vector<picture> deerAnim_left{ deer3, deer4 };
+
+const picture explosion(vector<wstring>{
+        L"         BOOM!!!",
+        L"     ˷ ₍˷  ˷ ₎ ˷ ₎˷",
+        L"   (˷ ₍ ( ₍  )˷  ₎˷˷)",
+        L" ( (  (    )   `)  ) ˷)",
+        L"(˷˷ (˷   (˷ ₎ ˷) ˷) ₎˷˷)",
+        L"    `~~`╲ ' . /`~~`",
+        L"         ;   ;",
+        L"         /   ╲",
+        L"________/_ __ ╲________"
+});
+
+const picture tomb(vector<wstring>{
+        L"   _",
+        L" _|R|_",
+        L"│_ I _│",
+        L" ╭|P|╮",
+        L"_||_||_"
+});
+
+const picture dancing1(vector<wstring>{
+        L" (•․•)/",
+        L"<)   )",
+        L" ╱  ╲"
+});
+const picture dancing2(vector<wstring>{
+        L"╲(•․•)",
+        L" (   (>",
+        L" ╱  ╲"
+});
+const vector<picture> dancing{ dancing1, dancing2 };
+
+const picture tree(vector<wstring>{
+        L"  _",
+        L" ( ) ",
+        L"(_X_)",
+        L"  j"
+});
+
 const picture m1(vector<wstring>{
     L" o ",
-    L"/|\\",
-    L"/ \\"
+    L"╱|╲",
+    L"╱ ╲"
 });
 const picture m2(vector<wstring>{
-    L"\\ o /",
+    L"╲ o ╱",
     L"  |  ",
-    L" / \\ "
+    L" ╱ ╲ "
 });
 const picture m3(vector<wstring>{
     L"_ o ",
-    L" /\\",
-    L"| \\"
+    L" ╱╲",
+    L"| ╲"
 });
 const picture m4(vector<wstring>{
     L"",
-    L" ___\\o",
-    L"/)  | "
+    L" ___╲o",
+    L"╱)  | "
 });
 const picture m5(vector<wstring>{
     L"__|  ",
-    L"  \\o ",
-    L"  ( \\"
+    L"   ╲o ",
+    L"  ( ╲"
 });
 const picture m6(vector<wstring>{
-    L"\\ /",
+    L"╲ ╱",
     L" | ",
-    L"/o\\"
+    L"╱o╲"
 });
 const picture m7(vector<wstring>{
     L"   |__",
     L" o/   ",
-    L"/ )   "
+    L"╱ )   "
 });
 const picture m8(vector<wstring>{
     L"",
-    L"o/__ ",
-    L"|  (\\"
+    L"o╱__ ",
+    L"|  (╲"
 });
 const picture m9(vector<wstring>{
     L"o _",
-    L"/\\ ",
-    L"/ |"
+    L"╱╲ ",
+    L"╱ |"
 });
 const vector<picture>manAnim{ m1, m2, m3, m4, m5, m6, m7, m8, m9, m2, m1 };
+
+const picture trafficLight(vector<wstring>{
+    L"┌─┐",
+    L"│O│",
+    L"│O│",
+    L"└╥┘"
+});
 
 const picture title(vector<wstring>{
     L" _____                   _                                    _ ",
