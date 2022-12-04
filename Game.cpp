@@ -249,27 +249,18 @@ void Game::Start()
 					curFileName = saveFile[index];
 					string _name = curFileName + ".txt";
 					fstream file("Saves/" + _name, ios::in);
-					int _x = 0, _y = 0, health, level;
+					int _x , _y , health, level;
 					file >> _x >> _y >> health >> level;
 					LoadPlayer(Position(_x,_y), health, level); // temporary test
 					// load game data
 					string _type = " ";
-					int _velocity = 0, _dir = 0;
-					for (auto i : vehicleList)
-						delete i;
-					vehicleList.clear();
-					for (auto j : animalList)
-						delete j;
-					animalList.clear();
-					for (auto k : lights)
-						delete k;
-					lights.clear();
+					int _velocity, _dir;
+
 					while (!file.eof())
 					{
-						//file >> _type >> _x >> _y >> _dir >> _velocity;
 						file >> _type;
 						if (_type == "Car" || _type == "Truck" || _type == "Deer") {
-							file>> _x >> _y >> _dir >> _velocity;
+							file >> _x >> _y >> _dir >> _velocity;
 							if (_type == "Car")
 							{
 								if (_dir == 1)
@@ -291,15 +282,22 @@ void Game::Start()
 								else
 									animalList.push_back(new Deer(_x, _y, left_, _velocity));
 							}
+							else if (_type == "Bird")
+							{
+								if (_dir == 1)
+									animalList.push_back(new Bird(_x, _y, right_, _velocity));
+								else
+									animalList.push_back(new Bird(_x, _y, left_, _velocity));
+							}
 						}
 						else if (_type == "lights")
 						{
 							int tR = 0, tG = 0, _stop = 0, cT = 0;
 							file >> _x >> _y >> tR >> tG >> _stop >> cT;
-							if (tR != 0)
-								lights.push_back(new TrafficLight(_x, _y, tR, tG, _stop, cT));
+							lights.push_back(new TrafficLight(_x, _y, tR, tG, _stop, cT));
 						}
 					}
+					lights.pop_back();
 					file.close();
 
 					// start the game
@@ -329,11 +327,7 @@ void Game::Start()
 				for (auto j : animalList)
 					delete j;
 				animalList.clear();
-				for (auto k : lights)
-					delete k;
-				lights.clear();
-				
-				Level1();
+				Level4();
 
 				state = playGame;
 				scene.join();
@@ -370,13 +364,13 @@ void Game::Start()
 					// write out the save file
 					string _name = curFileName + ".txt";
 					fstream file("Saves/" + _name, ios::out);
-					/*file << player->x << " " << player->y << " " << player->getHealth() << " " << player->getLevel();
+					/*file << player->x << " " << player->y << " " << player->getHealth() << " " << player->getLevel() << endl;
 					for (auto i : animalList)
-						file << " "<< i->getName() << " " << i->x << " " << i->y << " " << i->getDir() << " " << i->velocity();
-					for (auto i  : vehicleList)
-						file << " "<< i->getName() << " " << i->x << " " << i->y << " " << i->getDir() << " " << i->velocity();
+						file << i->getName() << " " << i->x << " " << i->y << " " << i->getDir() << " " << i->velocity() << endl;
+					for (auto i : vehicleList)
+						file << i->getName() << " " << i->x << " " << i->y << " " << i->getDir() << " " << i->velocity() << endl;
 					for (auto i : lights)
-						file << " " << i->getName() << " " << i->x << " " << i->y << " " << i->getRedTime() << " " << i->getGreenTime() << " " << int(i->isStop()) << " " << i->curTime();
+						file << i->getName() << " " << i->x << " " << i->y << " " << i->isStop() << endl;
 					file.close();*/
 					file << player->x << " " << player->y << " " << player->getHealth() << " " << player->getLevel() << endl;
 					for (auto i : animalList)
@@ -384,7 +378,7 @@ void Game::Start()
 					for (auto i : vehicleList)
 						file << i->getName() << " " << i->x << " " << i->y << " " << i->getDir() << " " << i->velocity() << endl;
 					for (auto i : lights)
-						file << i->getName() << " " << i->x << " " << i->y << " " << i->getRedTime() << " " << i->getGreenTime() << " " << int(i->isStop()) << " " << i->curTime() << endl;
+						file << i->getName() << " " << i->x << " " << i->y << " " << i->getRedTime() << " " << i->getGreenTime() << " " << i->isStop() << " " << i->curTime() << endl;
 					file.close();
 
 					// announcement
@@ -413,8 +407,8 @@ void Game::Start()
 					for (auto j : animalList)
 						delete j;
 					animalList.clear();
-					for (auto k : lights)
-						delete k;
+					for (auto i : lights)
+						delete i;
 					lights.clear();
 				}
 			}
@@ -422,16 +416,16 @@ void Game::Start()
 		else if (state == playGame) // the main game back end system
 		{
 			// load default level if it be empty
-			if (vehicleList.empty() && animalList.empty())
+			if (vehicleList.empty() && animalList.empty() && lights.empty())
 			{
 				if (player->getLevel() == 1) Level1();
 				else if (player->getLevel() == 2) Level2();
 				else if (player->getLevel() == 3) Level3();
 				else Level4();
-
 			}
 
 			MOVING = toupper(key);
+			
 			if (key == 27)
 			{
 				// do the pause menu
@@ -444,6 +438,17 @@ void Game::Start()
 			// if (key == 'w') // get the input file here
 			if (player->isDead())
 			{
+				// clear up RAM
+				for (auto i : vehicleList)
+					delete i;
+				vehicleList.clear();
+				for (auto j : animalList)
+					delete j;
+				animalList.clear();
+				for (auto i : lights)
+					delete i;
+				lights.clear();
+
 				state = mainMenu;
 				scene.join();
 				scene = thread(&Game::drawMenu, this);
@@ -700,22 +705,18 @@ bool Game::validMove(picture img, Position pos, int vel, MovingDir dir)
 	return true;
 }
 
-//int press_count = 1, press_timer = 1;
+int press_count = 0, press_timer = 3; // hmmmm
 
 void Game::updatePosPlayer(char key)
 {
-	/*if (press_count != 0)
-	{
-		press_count--;
-		return;
-	}
-	press_count = press_timer;*/
-
 	if (key == 'D' || key == 'A' || key == 'S' || key == 'W')
 	{
-		if (OnMusic)
+		press_count++;
+		if (OnMusic && press_count > 3)
 			playKeyBoardSound();
 	}
+	else
+		press_count = 0;
 	if (key == 'D' && validMove(player->curImg(), Position(player->x, player->y), player->velocity(), right_))
 	{
 		player->move(right_);
@@ -725,6 +726,29 @@ void Game::updatePosPlayer(char key)
 	{
 		player->move(left_);
 		FillArea(Position(player->x + player->velocity(), player->y), L' ', player->preImg().getWidth(), player->preImg().getHeight(), bgColor);
+	}
+	if (key == 'W' && player->y - player->velocity() <= 0) // touch the roof. go to next Level
+	{
+		if (player->isFinish())
+		{
+			
+		}
+		//
+		clearConsole();
+		// clear up RAM
+		for (auto i : vehicleList)
+			delete i;
+		vehicleList.clear();
+		for (auto j : animalList)
+			delete j;
+		animalList.clear();
+		for (auto i : lights)
+			delete i;
+		lights.clear();
+
+		player->y = getHeight() - player->curImg().getHeight() - 1;
+		player->x = (getWidth() - offset_box) / 2 - player->curImg().getWidth();
+		player->nextLevel();
 	}
 	if (key == 'W' && validMove(player->curImg(), Position(player->x, player->y), player->velocity(), up_))
 	{
@@ -736,8 +760,6 @@ void Game::updatePosPlayer(char key)
 		player->move(down_);
 		FillArea(Position(player->x, player->y - player->velocity()), L' ', player->preImg().getWidth(), player->preImg().getHeight(), bgColor);
 	}
-	/*if (key == ' ')
-		player->move(idle_);*/
 }
 //void OnEdge(int& x, int& y)
 //{
@@ -854,11 +876,15 @@ void Game::Level1()
 	vehicleList.push_back(new Truck(10, 35, right_, 4));
 	vehicleList.push_back(new Car(50, 36, right_, 4));
 	vehicleList.push_back(new Truck(90, 35, right_, 4));
+
 	lights.push_back(new TrafficLight(170, 35, 3000, 4000));
 }
 void Game::Level2()
 {
-
+	// line 1
+	vehicleList.push_back(new Truck(10, 5, left_, 1));
+	vehicleList.push_back(new Car(50, 6, left_, 1));
+	animalList.push_back(new Deer(90, 5, left_, 1));
 }
 void Game::Level3()
 {
@@ -866,25 +892,56 @@ void Game::Level3()
 }
 void Game::Level4()
 {
-
+	lights.push_back(new TrafficLight(170, 10, 500, 4000));
+	lights.push_back(new TrafficLight(170, 35, 500, 4000));
+	lights.push_back(new TrafficLight(5, 30, 1000, 3000));
+	//line1
+	vehicleList.push_back(new Truck(10, 5, left_, 3));
+	vehicleList.push_back(new Car(50, 6, left_, 2));
+	vehicleList.push_back(new Car(100, 6, left_, 2));
+	//line2
+	vehicleList.push_back(new Car(50, 11, right_, 3));
+	vehicleList.push_back(new Truck(90, 10, right_, 2));
+	vehicleList.push_back(new Truck(140, 10, right_, 2));
+	//line3
+	animalList.push_back(new Deer(50, 15, right_, 2));
+	animalList.push_back(new Deer(90, 15, right_, 2));
+	//line4
+	animalList.push_back(new Deer(50, 20, left_, 3));
+	animalList.push_back(new Deer(90, 20, left_, 3));
+	animalList.push_back(new Deer(90, 20, right_, 2));
+	//line5
+	animalList.push_back(new Bird(90, 25, left_, 5));
+	animalList.push_back(new Bird(100, 25, right_, 5));
+	//line6
+	vehicleList.push_back(new Truck(30, 30, left_, 2));
+	vehicleList.push_back(new Car(60, 31, left_, 3));
+	vehicleList.push_back(new Car(100, 31, left_, 2));
+	//line7
+	vehicleList.push_back(new Car(10, 36, right_, 2));
+	vehicleList.push_back(new Car(50, 36, right_, 2));
+	vehicleList.push_back(new Truck(140, 35, right_, 2));
+	//line8
+	vehicleList.push_back(new Car(20, 40, right_, 4));
+	vehicleList.push_back(new Truck(110, 40, right_, 4));
 }
 void Game::drawGame()
 {
 	// what about using the damn stack and queue to pop and delete stuff
-	int countCar = 0, countTruck = 0, countBird = 0, countLeopard = 0;
-	for (auto i : vehicleList)
-	{
-		if (i->getName() == "Car") countCar++;
-		else countTruck++;
-	}
-	for (auto i : animalList)
-	{
-		if (i->getName() == "Bird") countBird++;
-		else countLeopard++;
-	}
-
 	while (state == playGame)
 	{
+		int countCar = 0, countTruck = 0, countBird = 0, countLeopard = 0;
+		for (auto i : vehicleList)
+		{
+			if (i->getName() == "Car") countCar++;
+			else countTruck++;
+		}
+		for (auto i : animalList)
+		{
+			if (i->getName() == "Bird") countBird++;
+			else countLeopard++;
+		}
+
 		drawBorder();
 
 		for (auto i : vehicleList)
@@ -965,10 +1022,11 @@ void Game::drawGame()
 game_over:
 	if (player->isDead())
 	{
+		drawString(getWidth() - offset_box + 5, 10, L"MÁU: " + to_wstring(player->getHealth()) + L" ", bgColor | FG_GREEN);
 		FillArea(Position(1, 1), L' ', getWidth() - offset_box - 1, getHeight() - 2, bgColor);
-		drawPicture(player->x + explosion.getWidth() / 3, player->y + explosion.getHeight() / 3, tomb, bgColor | FG_DARK_GREY);
-		drawString(player->x + tomb.getWidth() / 2 - 2, player->y + tomb.getHeight() + 4, L"PRESS ANY KEY TO RETURN TO MENU ... ", bgColor | FG_BLUE);
-		drawPicture(player->x + explosion.getWidth() / 3, player->y + explosion.getHeight() + 3, ded_man, bgColor | FG_DARK_GREY);
+		drawPicture((getWidth() - offset_box)/ 2 - tomb.getWidth(),  getHeight() / 2 - tomb.getHeight(), tomb, bgColor | FG_DARK_GREY);
+		drawString((getWidth() - offset_box)/ 2 - tomb.getWidth() - 5, getHeight() / 2, L"PRESS ANY KEY TO RETURN TO MENU ... ", bgColor | FG_BLUE);
+		drawPicture((getWidth() - offset_box)/ 2 - tomb.getWidth(), getHeight() / 2 + 3, ded_man, bgColor | FG_DARK_GREY);
 		drawConsole();
 		Sleep(1000);
 	}
