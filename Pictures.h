@@ -358,6 +358,13 @@ const picture mainMovingL(vector<wstring>{
         L" |     ||",
         L" (_(_ʃ-╯"
 });
+
+const picture ded_man(vector<wstring>{
+        L"   (ˉ⁾⁽ˉ)",
+        L" ╭_/  /_╮",
+        L" |     ||",
+        L"(_ʃ-(_ʃ╯"
+});
 const vector<picture> mainAnimL{ mainCharacterL, mainMovingL };
 
 const picture title(vector<wstring>{
