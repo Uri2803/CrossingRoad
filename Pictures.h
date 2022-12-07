@@ -332,6 +332,34 @@ const picture trafficLight(vector<wstring>{
     L"└╥┘"
 });
 
+const picture mainCharacterR(vector<wstring>{
+    L"   ˏ___ˎ",
+    L"ˏ_⌠ (__)",
+    L"||     |",
+    L"╰-ʅ_)-ʅ_)"
+});
+const picture mainMovingR(vector<wstring>{
+    L"   ˏ__ˎ",
+    L"ˏ_⌠ (__)",
+    L"||     |",
+    L"╰--ʅ_)_)"
+});
+const vector<picture> mainAnimR{ mainCharacterR, mainMovingR };
+
+const picture mainCharacterL(vector<wstring>{
+        L"  ˏ__ˎ",
+        L" (__) ᶩ_ˎ",
+        L" |     ||",
+        L"(_ʃ-(_ʃ╯"
+});
+const picture mainMovingL(vector<wstring>{
+        L"  ˏ__ˎ",
+        L" (__) ᶩ_ˎ",
+        L" |     ||",
+        L" (_(_ʃ-╯"
+});
+const vector<picture> mainAnimL{ mainCharacterL, mainMovingL };
+
 const picture title(vector<wstring>{
     L" _____                   _                                    _ ",
     L"/  __ \\                 (_)                                  | |",
