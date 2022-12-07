@@ -33,4 +33,6 @@ const Animation dancingAnimator(dancing, 300, COLOUR::FG_BLACK);
 const Animation dogAnimator(dogAnim, 300, COLOUR::FG_DARK_GREEN);
 const Animation pumAnimator(pumAnim, 300, COLOUR::FG_DARK_RED);
 const Animation introAnimator(introAnim, 300, COLOUR::FG_DARK_BLUE);
+const Animation mainCharR(mainAnimR, 200, COLOUR::FG_BLACK);
+const Animation mainCharL(mainAnimL, 200, COLOUR::FG_BLACK);
 #endif // !_ANIMATION_
