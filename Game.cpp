@@ -33,8 +33,20 @@ void Game::Level2()
 	vehicleList.push_back(new Truck(10, 5, left_, 1));
 	vehicleList.push_back(new Car(50, 6, left_, 1));
 	animalList.push_back(new Deer(90, 5, left_, 1));
-	//test
-	//tess
+	//line 2
+	animalList.push_back(new Deer(50, 15, left_, 2));
+	animalList.push_back(new Deer(90, 15, left_, 2));
+	//line3
+	vehicleList.push_back(new Truck(10, 25, right_, 5));
+	vehicleList.push_back(new Car(50, 26, right_, 2));
+	vehicleList.push_back(new Car(90, 26, right_, 2));
+
+	//line4
+
+	//line5
+
+
+
 }
 void Game::Level3()
 {
